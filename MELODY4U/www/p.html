@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Přání — melody4u</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="header"><div class="header-inner container">
+  <a class="brand" href="index.html">melody4u</a>
+  <nav class="nav">
+    <a href="create.html">Vytvořit přání</a>
+    <a href="ringtones.html">Vyzvánění</a>
+  </nav>
+</div></div>
+
+<main class="container">
+  <h1>Tvoje přání</h1>
+  <div class="card">
+    <div class="muted" style="font-size:14px;margin-bottom:8px;">Odkaz: melody4u.com/p/abc123</div>
+    <audio class="audio" controls src="assets/demo.wav"></audio>
+    <p>Zbývající přehrání: <span class="counter" id="cnt">2</span></p>
+    <div class="row">
+      <button class="btn" onclick="playOnce()">Přehrát teď</button>
+      <button class="btn btn-outline" onclick="navigator.clipboard.writeText(location.href)">Sdílet odkaz</button>
+    </div>
+  </div>
+</main>
+
+<script>
+function playOnce(){
+  const a = document.querySelector('audio');
+  a.currentTime = 0; a.play();
+  const c = document.getElementById('cnt');
+  const n = Math.max(0, parseInt(c.textContent||'0')-1);
+  c.textContent = String(n);
+}
+</script>
+
+<div class="footer"><div class="container">© 2025 melody4u — Osobní audio přání & vyzvánění</div></div>
+</body>
+</html>

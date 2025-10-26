@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>melody4u — Přehrát přání</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    main { max-width: 720px; margin: 40px auto; }
+    .audio { width: 100%; margin-top: 16px; }
+    .muted { color: #aaa }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>🎶 Tvoje audio přání</h1>
+    <p id="status" class="muted">Načítám…</p>
+    <audio id="player" class="audio" controls style="display:none"></audio>
+  </main>
+
+  <script>
+    const API = 'https://melody4u-api.onrender.com';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+
+    const status = document.getElementById('status');
+    const player = document.getElementById('player');
+
+    if (!id) {
+      status.textContent = 'Chybí ID v odkazu.';
+    } else {
+      fetch(`${API}/share/${encodeURIComponent(id)}`, { mode: 'cors' })
+        .then(r => r.json())
+        .then(data => {
+          if (!data.ok) throw new Error(data.error || 'Soubor nedostupný.');
+
+          status.textContent = `Zbývající přehrání: ${data.meta?.remaining ?? '—'}`;
+          player.src = data.url;
+          player.style.display = '';
+          // Pokus o auto-play (ne vždy prohlížeče povolí)
+          player.play().catch(() => { /* ignore */ });
+        })
+        .catch(err => {
+          status.textContent = 'Chyba: ' + err.message;
+        });
+    }
+  </script>
+</body>
+</html>

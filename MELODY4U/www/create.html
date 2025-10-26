@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>melody4u — Vytvořit přání</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0f1115; --card:#171923; --muted:#9aa4b2; --text:#e9edf1; --brand:#7c5cff; --border:#2a2f3a;
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    .container{max-width:1080px;margin:40px auto;padding:0 16px}
+    h1{margin:0 0 8px} .hint{color:var(--muted)}
+    .grid{display:grid;gap:18px} @media(min-width:920px){.grid{grid-template-columns:1fr 1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .btn{background:var(--brand);border:none;color:#fff;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+    .btn[disabled]{opacity:.5;cursor:not-allowed}
+    .btn--soft{background:#2b2f3c}
+    .btn--ghost{background:transparent;border:1px solid var(--border)}
+    .input{display:block;width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#121520;color:#fff}
+    audio{width:100%}
+    .kv{font-family:ui-monospace,Consolas,Monaco,monospace;color:var(--muted);font-size:12px}
+    .hr{height:1px;background:var(--border);margin:20px 0}
+    .ok{color:#76e3a1} .err{color:#ff8693}
+    .badge{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid var(--border);color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header style="margin-bottom:24px">
+      <h1>Vytvořit přání</h1>
+      <p class="hint">Nahraj svůj hlas, vyber hudbu a klikni na <b>Vygenerovat náhled</b>. Výsledek je MP3 🎶.</p>
+    </header>
+
+    <div class="grid">
+      <!-- HLAS -->
+      <section class="card">
+        <h2 style="margin-top:0">Nahraj svůj hlas</h2>
+        <div class="row">
+          <button id="recStart" class="btn">● Začít nahrávat</button>
+          <button id="recStop" class="btn btn--soft" disabled>■ Zastavit</button>
+          <button id="recClear" class="btn btn--ghost" disabled>✕ Smazat nahrávku</button>
+        </div>
+        <p id="recStatus" class="hint" style="margin:8px 0 0"></p>
+        <audio id="voiceLocal" controls style="margin-top:10px;display:none"></audio>
+
+        <div class="row" style="margin-top:12px">
+          <button id="uploadVoice" class="btn" disabled>⬆︎ Nahrát hlas na server</button>
+          <span id="voiceInfo" class="kv"></span>
+        </div>
+        <audio id="voiceRemote" controls style="margin-top:10px;display:none"></audio>
+      </section>
+
+      <!-- HUDBA -->
+      <section class="card">
+        <h2 style="margin-top:0">Vyber hudební podkres</h2>
+        <input id="musicFile" type="file" accept="audio/*" class="input" />
+        <audio id="musicLocal" controls style="margin-top:10px;display:none"></audio>
+
+        <div class="row" style="margin-top:12px">
+          <button id="uploadMusic" class="btn" disabled>⬆︎ Nahrát hudbu na server</button>
+          <span id="musicInfo" class="kv"></span>
+        </div>
+        <audio id="musicRemote" controls style="margin-top:10px;display:none"></audio>
+      </section>
+    </div>
+
+    <!-- RENDER -->
+    <section class="card" style="margin-top:18px">
+      <div class="row" style="justify-content:space-between">
+        <h2 style="margin:0">Serverový mix</h2>
+        <span id="renderBadge" class="badge">čeká se na upload</span>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button id="renderBtn" class="btn" disabled>✨ Vygenerovat náhled</button>
+        <span id="renderMsg" class="hint"></span>
+      </div>
+      <audio id="renderAudio" controls style="margin-top:10px;display:none"></audio>
+      <div id="renderLinkWrap" style="margin-top:8px;display:none">
+        <a id="renderLink" class="kv" href="#" target="_blank" rel="noopener">Otevřít / stáhnout výsledek</a>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ===== API URL =====
+    const API_URL = 'https://melody4u-api.onrender.com'; // případně změň
+
+    // ===== Pomocníci =====
+    const $ = s => document.querySelector(s);
+    const setVisible = (el, v) => el.style.display = v ? '' : 'none';
+    const setEnabled = (el, v) => el.disabled = !v;
+
+    async function uploadToAPI(file, filename){
+      const fd = new FormData();
+      fd.append('file', file, filename || file.name || 'upload.bin');
+      const res = await fetch(API_URL + '/upload', { method:'POST', body: fd, mode:'cors' });
+      if(!res.ok) throw new Error('Upload HTTP '+res.status);
+      const json = await res.json();
+      if(!json.ok) throw new Error(json.error || 'Upload failed');
+      return json; // { ok, key, url }
+    }
+
+    // ===== Hlas (nahrávání) =====
+    const recStart = $('#recStart');
+    const recStop = $('#recStop');
+    const recClear = $('#recClear');
+    const recStatus = $('#recStatus');
+    const voiceLocal = $('#voiceLocal');
+    const uploadVoiceBtn = $('#uploadVoice');
+    const voiceInfo = $('#voiceInfo');
+    const voiceRemote = $('#voiceRemote');
+
+    let mediaRecorder, chunks=[], voiceBlob=null, voiceServer=null, musicServer=null;
+
+    async function ensureRecorder(){
+      if (mediaRecorder) return;
+      const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = (e)=>{ if(e.data.size>0) chunks.push(e.data); };
+      mediaRecorder.onstop = ()=>{
+        voiceBlob = new Blob(chunks, { type: 'audio/webm' });
+        chunks = [];
+        voiceLocal.src = URL.createObjectURL(voiceBlob);
+        setVisible(voiceLocal, true);
+        setEnabled(uploadVoiceBtn, true);
+        recStatus.textContent = 'Nahrávka připravena k uploadu.';
+        setEnabled(recClear, true);
+        updateRenderState();
+      };
+    }
+
+    recStart.onclick = async ()=>{
+      try{
+        await ensureRecorder();
+        mediaRecorder.start();
+        setEnabled(recStart,false); setEnabled(recStop,true);
+        recStatus.textContent = 'Nahrávání…';
+      }catch(e){ alert('Nelze získat mikrofon: '+e.message); }
+    };
+    recStop.onclick = ()=>{
+      mediaRecorder && mediaRecorder.stop();
+      setEnabled(recStart,true); setEnabled(recStop,false);
+      recStatus.textContent = 'Zpracovávám…';
+    };
+    recClear.onclick = ()=>{
+      voiceBlob=null; voiceServer=null; voiceInfo.textContent='';
+      voiceLocal.src=''; setVisible(voiceLocal,false);
+      voiceRemote.src=''; setVisible(voiceRemote,false);
+      setEnabled(uploadVoiceBtn,false); setEnabled(recClear,false);
+      recStatus.textContent = 'Nahrávka vymazána.';
+      updateRenderState();
+    };
+
+    uploadVoiceBtn.onclick = async ()=>{
+      if(!voiceBlob) return alert('Nejprve nahrajte hlas.');
+      setEnabled(uploadVoiceBtn,false); uploadVoiceBtn.textContent = 'Nahrávám…';
+      try{
+        const res = await uploadToAPI(voiceBlob, 'voice.webm');
+        voiceServer = res;
+        voiceInfo.textContent = 'Na serveru: '+ res.key;
+        voiceRemote.src = res.url; setVisible(voiceRemote,true);
+      }catch(e){ alert(e.message); }
+      finally{
+        uploadVoiceBtn.textContent = '⬆︎ Nahrát hlas na server';
+        updateRenderState();
+      }
+    };
+
+    // ===== Hudba (výběr + upload) =====
+    const musicInput = $('#musicFile');
+    const musicLocal = $('#musicLocal');
+    const uploadMusicBtn = $('#uploadMusic');
+    const musicInfo = $('#musicInfo');
+    const musicRemote = $('#musicRemote');
+
+    musicInput.addEventListener('change', ()=>{
+      const f = musicInput.files?.[0];
+      if(!f){ musicLocal.src=''; setVisible(musicLocal,false); setEnabled(uploadMusicBtn,false); return; }
+      musicLocal.src = URL.createObjectURL(f);
+      setVisible(musicLocal,true);
+      setEnabled(uploadMusicBtn,true);
+    });
+
+    uploadMusicBtn.onclick = async ()=>{
+      const f = musicInput.files?.[0]; if(!f) return;
+      setEnabled(uploadMusicBtn,false); uploadMusicBtn.textContent='Nahrávám…';
+      try{
+        const res = await uploadToAPI(f, f.name);
+        musicServer = res;
+        musicInfo.textContent = 'Na serveru: '+ res.key;
+        musicRemote.src = res.url; setVisible(musicRemote,true);
+      }catch(e){ alert(e.message); }
+      finally{
+        uploadMusicBtn.textContent='⬆︎ Nahrát hudbu na server';
+        updateRenderState();
+      }
+    };
+
+    // ===== Render =====
+    const renderBtn = $('#renderBtn');
+    const renderMsg = $('#renderMsg');
+    const renderAudio = $('#renderAudio');
+    const renderLinkWrap = $('#renderLinkWrap');
+    const renderLink = $('#renderLink');
+    const renderBadge = $('#renderBadge');
+
+    function updateRenderState(){
+      const ready = !!(voiceServer && musicServer);
+      setEnabled(renderBtn, ready);
+      renderBadge.textContent = ready ? 'připraveno k renderu' : 'čeká se na upload';
+    }
+
+    renderBtn.onclick = async ()=>{
+      if(!voiceServer || !musicServer) return;
+      setEnabled(renderBtn,false); renderMsg.textContent='Renderuji…';
+      setVisible(renderAudio,false); setVisible(renderLinkWrap,false);
+
+      try{
+        const resp = await fetch(API_URL+'/render', {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify({ voiceKey: voiceServer.key, musicKey: musicServer.key }),
+          mode:'cors'
+        });
+        const json = await resp.json();
+        if(!resp.ok || !json.ok) throw new Error(json.error || 'Render selhal');
+
+        renderAudio.src = json.url;
+        setVisible(renderAudio,true);
+        renderLink.href = json.url;
+        setVisible(renderLinkWrap,true);
+        renderMsg.innerHTML = '<span class="ok">Hotovo.</span>';
+      }catch(e){
+        console.error(e);
+        renderMsg.innerHTML = '<span class="err">Chyba: '+e.message+'</span>';
+      }finally{
+        setEnabled(renderBtn,true);
+      }
+    };
+  </script>
+</body>
+</html>

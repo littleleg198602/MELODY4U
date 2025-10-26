@@ -1,0 +1,138 @@
+:root { 
+  --bg:#0b0c10; 
+  --fg:#e5e7eb; 
+  --muted:#9ca3af; 
+  --card: rgba(255,255,255,.05); 
+  --border: rgba(255,255,255,.1); 
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#0b0c10;
+  color:#e5e7eb;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif
+}
+a{color:#fff;text-decoration:none}
+a:hover{text-decoration:underline}
+.container{max-width:1000px;margin:0 auto;padding:16px}
+.header{position:sticky;top:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);border-bottom:1px solid var(--border)}
+.header-inner{display:flex;justify-content:space-between;align-items:center;padding:12px 16px}
+.brand{font-weight:600;letter-spacing:.5px}
+.nav{display:flex;gap:12px;font-size:14px}
+.hero{padding:48px 0;text-align:center}
+.btn{background:#fff;color:#000;padding:10px 16px;border-radius:12px;border:none;cursor:pointer;font-weight:600}
+.btn-outline{background:transparent;border:1px solid var(--border);color:#fff}
+.grid{display:grid;gap:12px}
+@media(min-width:768px){.grid-3{grid-template-columns:repeat(3,1fr)}}
+.card{background:var(--card);border:1px solid var(--border);padding:16px;border-radius:16px;box-shadow:0 6px 30px rgba(0,0,0,.2)}
+h1{font-size:28px;margin:0 0 8px}
+h2{font-size:20px;margin:24px 0 8px}
+.muted{color:#9ca3af}
+.footer{border-top:1px solid var(--border);margin-top:48px;padding:24px 0;color:#9ca3af;font-size:14px}
+.section{margin-top:20px}
+.drop{border:1px dashed var(--border);text-align:center;padding:24px;border-radius:16px;cursor:pointer}
+.audio{width:100%}
+.row{display:flex;gap:8px;align-items:center}
+.badge{padding:2px 8px;border:1px solid var(--border);border-radius:999px;font-size:12px;color:#9ca3af}
+.counter{font-weight:700}
+/* --- Brand --- */
+:root {
+  --brand:#8b5cf6;            /* fialová */
+  --brand-600:#7c3aed;
+  --panel:#0f1115;
+  --panel-border:rgba(255,255,255,.08);
+}
+
+.hero--panel{
+  background:
+    radial-gradient(1200px 400px at 20% -10%, rgba(139,92,246,.25), transparent 60%),
+    radial-gradient(800px 300px at 100% 10%, rgba(139,92,246,.12), transparent 60%),
+    var(--panel);
+  border-bottom:1px solid var(--panel-border);
+}
+
+.btn--primary{
+  background:var(--brand);
+  color:#fff;
+  box-shadow:0 10px 30px rgba(139,92,246,.35);
+}
+.btn--primary:hover{ background:var(--brand-600); }
+.btn--soft{
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  border:1px solid var(--border);
+}
+.btn--ghost{
+  background:transparent;
+  border:1px solid var(--border);
+  color:#fff;
+}
+
+/* Layouty */
+.hero__grid{
+  display:grid; gap:28px; align-items:center; padding:48px 0;
+}
+@media(min-width:900px){ .hero__grid{ grid-template-columns:1.2fr 1fr; } }
+.hero__title{ font-size:36px; line-height:1.1; margin:0 0 10px; }
+.hero__lead{ color:var(--muted); max-width:42ch; margin-bottom:16px; }
+
+.hero__art{ position:relative; display:flex; align-items:center; justify-content:center; }
+.hero__icons{ position:absolute; right:-8px; top:10%; display:flex; gap:12px; font-size:28px; opacity:.9; }
+
+/* „Telefon“ */
+.phone{
+  width:240px; height:480px; border-radius:36px;
+  background:linear-gradient(180deg,#12151b,#0b0c10);
+  border:1px solid var(--panel-border);
+  box-shadow:0 30px 80px rgba(0,0,0,.5);
+  position:relative; margin:auto;
+}
+.phone__screen{
+  position:absolute; inset:16px; border-radius:28px;
+  background:linear-gradient(180deg,#151821,#0c0d11);
+  border:1px solid var(--panel-border);
+  display:flex; align-items:center; justify-content:center; flex-direction:column; gap:18px;
+}
+.play{
+  width:64px; height:64px; border-radius:50%;
+  background:radial-gradient(120% 120% at 30% 30%, #9a6bff, #6c4ad9);
+  position:relative;
+}
+.play::after{
+  content:''; position:absolute; left:26px; top:20px;
+  border-style:solid; border-width:12px 0 12px 18px; border-color:transparent transparent transparent white;
+}
+.wave{
+  width:140px; height:12px; border-radius:999px;
+  background:linear-gradient(90deg, rgba(139,92,246,.9), rgba(139,92,246,.25));
+}
+
+/* Karty a prvky */
+.center{ text-align:center; }
+.card-header{ font-weight:600; margin-bottom:10px; }
+.card-title{ font-weight:600; margin-top:6px; }
+.big-emoji{ font-size:28px; margin-bottom:6px; }
+.stack{ display:grid; gap:10px; }
+.pill{
+  display:flex; align-items:center; justify-content:center;
+  padding:12px 14px; border-radius:12px; border:1px solid var(--border);
+  background:rgba(255,255,255,.04); color:#fff;
+}
+.list{ display:grid; gap:10px; }
+.list-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px dashed var(--border); }
+.list-row:last-child{ border-bottom:none; }
+
+/* Ceník */
+.price-amount{ font-size:26px; margin-top:6px; }
+.price-amount span{ font-size:40px; font-weight:800; }
+.price--highlight{
+  border:1px solid rgba(139,92,246,.5);
+  box-shadow:0 12px 50px rgba(139,92,246,.25);
+}
+.mt-2{ margin-top:8px; }
+.gap-lg{ gap:24px; }
+.grid-2{ grid-template-columns:1fr; }
+@media(min-width:900px){ .grid-2{ grid-template-columns:1fr 1fr; } }
+
+/* Titulky sekcí */
+.section-title{ font-size:22px; margin:28px 0 12px; }

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>melody4u — Hudební přání</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<!-- Header -->
+<div class="header"><div class="header-inner container">
+  <a class="brand" href="index.html">melody4u</a>
+  <nav class="nav">
+    <a href="create.html">Vytvořit přání</a>
+    <a href="ringtones.html">Vyzvánění</a>
+  </nav>
+</div></div>
+
+<main>
+  <!-- HERO -->
+  <section class="hero hero--panel">
+    <div class="container hero__grid">
+      <div class="hero__text">
+        <h1 class="hero__title">Hudební přání,<br> které zazní jen pro vás</h1>
+        <p class="hero__lead">Nahraj svůj vzkaz, přidej oblíbenou melodii a vytvoř unikátní audio dárek.</p>
+        <p><a class="btn btn--primary" href="create.html">Vytvořit přání</a></p>
+      </div>
+      <div class="hero__art">
+        <!-- jednoduchý „telefon“ z CSS + ikonky -->
+        <div class="phone">
+          <div class="phone__screen">
+            <div class="play"></div>
+            <div class="wave"></div>
+          </div>
+        </div>
+        <div class="hero__icons">
+          <span>🎵</span><span>🎁</span><span>🎧</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Jak to funguje -->
+  <section class="container">
+    <h2 class="section-title">Jak to funguje</h2>
+    <div class="grid grid-3">
+      <div class="card center">
+        <div class="big-emoji">🎙️</div>
+        <div class="card-title">Nahraj svůj hlas</div>
+        <p class="muted">Krátký vzkaz přímo v prohlížeči.</p>
+      </div>
+      <div class="card center">
+        <div class="big-emoji">🎼</div>
+        <div class="card-title">Vyber si hudbu</div>
+        <p class="muted">Z katalogu nebo vlastní soubor.</p>
+      </div>
+      <div class="card center">
+        <div class="big-emoji">🔒</div>
+        <div class="card-title">Sdílej s limitem</div>
+        <p class="muted">1–3 přehrání pro obdarovaného.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ukázky a Vyzvánění -->
+  <section class="container grid grid-2 gap-lg">
+    <div class="card">
+      <div class="card-header">Ukázky</div>
+      <div class="stack">
+        <a class="pill" href="create.html">▶️ Nahraj svůj hlas</a>
+        <a class="pill" href="create.html">🎵 Vyber si hudbu</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Vyzváněcí tóny</div>
+      <div class="list">
+        <div class="list-row">
+          <span>Ringtone 1</span>
+          <div class="row">
+            <button class="btn btn--ghost" onclick="new Audio('assets/demo.wav').play()">▶️ Přehrát</button>
+            <a class="btn btn--soft" href="ringtones.html">Stáhnout</a>
+          </div>
+        </div>
+        <div class="list-row">
+          <span>Ringtone 2</span>
+          <div class="row">
+            <button class="btn btn--ghost" onclick="new Audio('assets/demo.wav').play()">▶️ Přehrát</button>
+            <a class="btn btn--soft" href="ringtones.html">Stáhnout</a>
+          </div>
+        </div>
+        <div class="list-row">
+          <span>Ringtone 3</span>
+          <div class="row">
+            <button class="btn btn--ghost" onclick="new Audio('assets/demo.wav').play()">▶️ Přehrát</button>
+            <a class="btn btn--soft" href="ringtones.html">Stáhnout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ceník -->
+  <section class="container">
+    <h2 class="section-title">Ceník</h2>
+    <div class="grid grid-3">
+      <div class="price card center">
+        <div class="price-title">1 přehrání</div>
+        <div class="muted">Zdarma na vyzkoušení</div>
+        <a class="btn btn--soft mt-2" href="create.html">Vyzkoušet</a>
+      </div>
+      <div class="price card center price--highlight">
+        <div class="price-title">3 přehrání</div>
+        <div class="price-amount"><span>79</span> Kč</div>
+        <a class="btn btn--primary mt-2" href="create.html">Koupit</a>
+      </div>
+      <div class="price card center">
+        <div class="price-title">VIP balíček</div>
+        <div class="price-amount"><span>199</span> Kč</div>
+        <a class="btn btn--soft mt-2" href="create.html">Získat</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Footer -->
+<div class="footer"><div class="container">© 2025 melody4u — Osobní audio přání & vyzvánění</div></div>
+</body>
+</html>
